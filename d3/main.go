@@ -68,42 +68,56 @@ func main() {
 	sum1 := 0
 	sum2 := 0
 
-	for _, ln := range input {
-		sum1 += getCommonItemInRucsack(ln)
-	}
+	for i, ln := range input {
+		// 1st task
+		sum1 += getCommonItemInRucsackValue(ln)
 
-	i := 0
-	for {
-		if i >= len(input) {
-			break
+		// 2nd task
+		if i == 0 || i%3 == 0 {
+			sum2 += getLabelValue(toSlice(input[i]), toSlice(input[i+1]), toSlice(input[i+2]))
 		}
-
-		sum2 += getCommonItemInRucsack(input[i] + input[i+1] + input[i+2])
-		i += 3
 	}
 
 	fmt.Println("Priorities", sum1, sum2)
 }
 
-func getCommonItemInRucsack(s string) int {
-	sl := strings.Split(s, "")
+func toSlice(s string) []string {
+	return strings.Split(s, "")
+}
+
+func toMap(s []string) map[string]int {
+	m := make(map[string]int)
+
+	for _, v := range s {
+		m[v] = 1
+	}
+
+	return m
+}
+
+func getValue(s string) int {
+	if s == "" {
+		return 0
+	}
+
+	return values[s]
+}
+
+func getCommonItemInRucsackValue(s string) int {
+	sl := toSlice(s)
 	half := len(sl) / 2
 	c1 := sl[:half]
 	c2 := sl[half:]
 
 	d := getDuplicateInSlices(c1, c2)
 
-	return values[d]
+	return getValue(d)
 }
 
 func getDuplicateInSlices(s1 []string, s2 []string) string {
 	d := ""
 
-	m := make(map[string]int)
-
-	for _, v := range s1 {
-		m[v] = 1
-	}
+	m := toMap(s1)
 
 	for _, v := range s2 {
 		if m[v] == 1 {
@@ -113,6 +127,25 @@ func getDuplicateInSlices(s1 []string, s2 []string) string {
 	}
 
 	return d
+}
+
+func getLabelValue(s1 []string, s2 []string, s3 []string) int {
+	d := ""
+
+	m := toMap(s1)
+
+	for _, v := range s2 {
+		if m[v] == 1 {
+			for _, v2 := range s3 {
+				if v == v2 {
+					d = v
+					break
+				}
+			}
+		}
+	}
+
+	return getValue(d)
 }
 
 func readInput(f string) []string {
